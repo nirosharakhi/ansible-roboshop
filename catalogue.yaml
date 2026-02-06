@@ -42,7 +42,7 @@
     - name: start and enable catalogue
       ansible.builtin.service:
         name: catalogue
-        state: present
+        state: start
         enabled: yes
     - name: copy mongodb repo
       ansible.builtin.copy:
