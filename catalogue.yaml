@@ -77,4 +77,4 @@
 
   - name: load products
     ansible.builtin.shell: mongosh --host mongodb.itsmehanshith.fun < /app/db/master-data.js
-    when: catalogue_output.stdout | int == 0
+    when: catalogue_output.stdout | int < 0
