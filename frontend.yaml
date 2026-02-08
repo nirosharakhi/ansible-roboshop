@@ -3,23 +3,20 @@
   become: yes
   tasks:
 
-  - name: disable default nginx
+  - name: disable default nginx module
     ansible.builtin.command: dnf module disable nginx -y
+    ignore_errors: yes
 
-  - name: enable nginx
+  - name: enable nginx 1.24 module
     ansible.builtin.command: dnf module enable nginx:1.24 -y
+    ignore_errors: yes
 
   - name: install nginx
     ansible.builtin.dnf:
       name: nginx
       state: present
 
-  - name: remove default nginx conf
-    ansible.builtin.file:
-      path: /etc/nginx/nginx.conf
-      state: absent
-
-  - name: copy roboshop nginx conf
+  - name: copy roboshop nginx config
     ansible.builtin.copy:
       src: nginx.conf
       dest: /etc/nginx/nginx.conf
@@ -33,6 +30,9 @@
     ansible.builtin.file:
       path: /usr/share/nginx/html
       state: directory
+      owner: nginx
+      group: nginx
+      mode: '0755'
 
   - name: download frontend code
     ansible.builtin.get_url:
@@ -45,10 +45,10 @@
       dest: /usr/share/nginx/html
       remote_src: yes
 
-  - name: test nginx config
+  - name: validate nginx config
     ansible.builtin.command: nginx -t
 
-  - name: start and enable nginx
+  - name: restart and enable nginx
     ansible.builtin.service:
       name: nginx
       state: restarted
