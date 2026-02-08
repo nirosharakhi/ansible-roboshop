@@ -2,6 +2,7 @@
   hosts: frontend
   become: yes
   tasks:
+
   - name: disable default nginx
     ansible.builtin.command: dnf module disable nginx -y
 
@@ -13,11 +14,15 @@
       name: nginx
       state: present
 
-  - name: start and enable nginx
-    ansible.builtin.service:
-      name: nginx
-      state: started
-      enabled: yes
+  - name: remove default nginx conf
+    ansible.builtin.file:
+      path: /etc/nginx/nginx.conf
+      state: absent
+
+  - name: copy roboshop nginx conf
+    ansible.builtin.copy:
+      src: nginx.conf
+      dest: /etc/nginx/nginx.conf
 
   - name: remove html directory
     ansible.builtin.file:
@@ -40,17 +45,11 @@
       dest: /usr/share/nginx/html
       remote_src: yes
 
-  - name: remove default nginx conf
-    ansible.builtin.file:
-      path: /etc/nginx/nginx.conf
-      state: absent
+  - name: test nginx config
+    ansible.builtin.command: nginx -t
 
-  - name: copy roboshop nginx conf
-    ansible.builtin.copy:
-      src: nginx.conf
-      dest: /etc/nginx/nginx.conf
-
-  - name: restart nginx
+  - name: start and enable nginx
     ansible.builtin.service:
       name: nginx
-      state: started
+      state: restarted
+      enabled: yes
